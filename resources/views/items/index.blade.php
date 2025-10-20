@@ -33,7 +33,6 @@
                 class="border border-gray-300 rounded-lg px-4 py-2 text-sm w-64 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition shadow-sm">
         </div>
 
-
         {{-- 🏢 Gedung --}}
         <select id="buildingSelect" name="building_id"
                 class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-44 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
@@ -126,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
-</script>
+</>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
