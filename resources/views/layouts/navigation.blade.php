@@ -33,7 +33,7 @@
             <x-application-logo class="block h-10 w-auto fill-current text-white" />
         </div>
 
-        
+
         <div class="flex items-center justify-between w-full">
     <!-- Logo + Tulisan kiri -->
     <div class="flex items-center gap-6">
@@ -52,7 +52,7 @@
 
         <!-- Avatar user kanan -->
         <div class="absolute right-0 flex items-center">
-            <x-dropdown align="right" width="56">
+            <x-dropdown align="right" width="64">
                 <x-slot name="trigger">
                     <button class="focus:outline-none">
                         <div class="user-avatar">
@@ -62,7 +62,7 @@
                 </x-slot>
 
                 <x-slot name="content">
-                    <div class="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
+                    <div class="px-4 py-2 text-sm text-white border-b border-gray-200">
                         {{ Auth::user()->email }}
                     </div>
                     <x-dropdown-link :href="route('profile.edit')">

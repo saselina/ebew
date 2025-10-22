@@ -1,15 +1,15 @@
 <x-app-layout>
-<x-slot name="header">
-    <div class="flex items-center gap-2">
-        <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-            📦 DAFTAR Barang
-        </h1>
-    </div>
-</x-slot>
+    <x-slot name="header">
+        <div class="flex items-center gap-2">
+            <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                📦 DAFTAR Barang
+            </h1>
+        </div>
+    </x-slot>
 
 
-    <div class="py-8 px-4 sm:px-6 lg:px-8">
- <div class="max-w-7xl mx-auto py-6 px-6 sm:px-8 lg:px-10 flex items-center"></div>
+    <div class="py-4 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto py-6 px-6 sm:px-8 lg:px-10 flex items-center"></div>
         {{-- ✅ Notifikasi sukses --}}
         @if (session('success'))
             <div
@@ -24,16 +24,9 @@
         @endif
 
         {{-- 🔽 Filter & Sortir --}}
-        <div class="mb-6">
-            <form id="filterForm" method="GET" action="{{ route('items.index') }}"
-                  class="flex flex-wrap justify-center items-center bg-white p-4 rounded-xl shadow-md border border-gray-200 max-w-6xl mx-auto gap-5">
-
-                {{-- 🔍 Pencarian --}}
-                <div class="flex items-center ml-2">
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        placeholder="Cari barang..."
-                        class="border border-gray-300 rounded-lg px-4 py-2 text-sm w-64 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition shadow-sm">
-                </div>
+        <div class="mb-4">
+        <form id="filterForm" method="GET" action="{{ route('items.index') }}"
+          class="flex flex-wrap justify-center items-center bg-white p-4 rounded-xl shadow-md border border-gray-200 max-w-6xl mx-auto gap-5">
 
                 {{-- 🏢 Gedung --}}
                 <select id="buildingSelect" name="building_id"
@@ -78,10 +71,19 @@
             </form>
         </div>
 
-        {{-- ✅ Tombol tambah --}}
-        <div class="mb-4">
-            <a href="{{ route('items.create') }}" class="btn btn-success">➕ Tambah Barang</a>
-        </div>
+        {{-- ✅ Tombol tambah + Search bar di kanan --}}
+<div class="mb-4 flex justify-between items-center max-w-7xl mx-auto">
+    {{-- Tombol Tambah Barang --}}
+    <a href="{{ route('items.create') }}" class="btn btn-success">➕ Tambah Barang</a>
+
+    {{-- Search Bar --}}
+    <form id="searchForm" method="GET" action="{{ route('items.index') }}" class="flex items-center flex-grow max-w-lg">
+        <input type="text" name="search" value="{{ request('search') }}"
+            placeholder="Cari barang..."
+            class="border border-gray-300 rounded-lg px-4 py-2 text-sm w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition shadow-sm">
+    </form>
+</div>
+
 
         {{-- ✅ Tabel data --}}
         <div class="overflow-x-auto mt-6">
@@ -216,4 +218,5 @@
             height: 200px;
         }
     </style>
+
 </x-app-layout>
