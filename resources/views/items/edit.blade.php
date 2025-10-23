@@ -67,19 +67,20 @@
       {{-- 4️⃣ NAMA BARANG --}}
       <div class="mb-3">
         <label class="form-label">Nama Barang</label>
-        <input type="text" name="name" class="form-control" required value="{{ $item->name }}">
+        <input type="text" name="name" id="nameInput" class="form-control" required value="{{ $item->name }}">
       </div>
 
       {{-- 5️⃣ DESKRIPSI --}}
       <div class="mb-3">
         <label class="form-label">Deskripsi</label>
-        <textarea name="description" class="form-control" rows="3">{{ $item->description }}</textarea>
+        <textarea name="description" id="description" class="form-control" rows="4">{{ $item->description }}</textarea>
+        <small class="text-muted">Deskripsi akan otomatis terisi berdasarkan nama dan jumlah barang.</small>
       </div>
 
       {{-- 6️⃣ JUMLAH --}}
       <div class="mb-3">
         <label class="form-label">Jumlah Barang</label>
-        <input type="number" name="quantity" class="form-control" required min="1" value="{{ $item->quantity }}">
+        <input type="number" name="quantity" id="quantityInput" class="form-control" required min="1" value="{{ $item->quantity }}">
       </div>
 
       <button type="submit" class="btn btn-primary">💾 Update</button>
@@ -88,7 +89,7 @@
   </div>
 
   <script>
-    // Fungsi AJAX saat ganti gedung
+    // AJAX ganti gedung → ruangan
     $('#buildingSelect').on('change', function () {
       const buildingId = $(this).val();
       const roomSelect = $('#roomSelect');
@@ -113,6 +114,21 @@
         roomSelect.html('<option value="">-- Pilih Ruangan --</option>');
       }
     });
+
+    // Auto isi deskripsi
+    function updateDescription() {
+      const name = $('#nameInput').val().trim();
+      const quantity = $('#quantityInput').val().trim();
+      const currentText = $('#description').val();
+
+      // Jika nama atau jumlah ada, isi otomatis template
+      if (name || quantity) {
+        let template = `Nama barang: ${name || '-'}\nMerk:\nKode unik:\nJumlah: ${quantity || '-'}`;
+        $('#description').val(template);
+      }
+    }
+
+    $('#nameInput, #quantityInput').on('input', updateDescription);
   </script>
 </body>
 </html>

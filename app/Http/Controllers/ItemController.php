@@ -79,7 +79,8 @@ public function index(Request $request)
         $query->latest();
     }
 
-    $items = $query->get();
+    $items = $query->paginate(10)->appends($request->query());
+
 
     return view('items.index', compact('items', 'buildings', 'rooms', 'categories'));
 }
