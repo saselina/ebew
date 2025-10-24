@@ -66,13 +66,20 @@
         </div>
 
         {{-- ✅ Tombol tambah + Search bar --}}
-        <div class="mb-4 flex justify-between items-center max-w-7xl mx-auto">
+        <div class="mb-4 flex justify-between items-center max-w-7xl mx-auto relative">
             <a href="{{ route('items.create') }}" class="btn btn-success">➕ Tambah Barang</a>
 
-            <form id="searchForm" method="GET" action="{{ route('items.index') }}" class="flex items-center flex-grow max-w-xs ml-4">
-                <input type="text" name="search" value="{{ request('search') }}"
-                    placeholder="Cari barang..."
-                    class="border border-gray-300 rounded-lg px-4 py-2 text-sm w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition shadow-sm">
+            <form id="searchForm" method="GET" action="{{ route('items.index') }}" class="relative">
+                <input type="text"
+                       id="search"
+                       name="search"
+                       placeholder="Cari barang..."
+                       value="{{ request('search') }}"
+                       class="border border-gray-300 rounded-3xl px-4 py-2 text-sm shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+                       style="width: 300px; height: 45px;">
+                <ul id="suggestions"
+                    class="absolute bg-white border border-gray-200 rounded-lg mt-2 shadow-lg w-full z-50 hidden">
+                </ul>
             </form>
         </div>
 
@@ -139,6 +146,11 @@
                 </tbody>
             </table>
         </div>
+
+        {{-- ✅ Pagination --}}
+        <div class="mt-6 flex justify-center">
+            {{ $items->links('pagination::tailwind') }}
+        </div>
     </div>
 
     {{-- ✅ Modal Detail Barang --}}
@@ -168,140 +180,118 @@
         </div>
     </div>
 
-{{-- ✅ Pagination --}}
-<div class="mt-6 flex justify-center">
-    {{ $items->links('pagination::tailwind') }}
-</div>
-
-
     {{-- ✅ Script --}}
     <script>
-        let fullDescription = '';
-        let descExpanded = false;
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search');
+        const suggestionBox = document.getElementById('suggestions');
+        const searchForm = document.getElementById('searchForm');
 
-        function showDetailModal(name, created, updated, description) {
-            document.getElementById('modalName').textContent = name;
-            document.getElementById('modalCreated').textContent = created;
-            document.getElementById('modalUpdated').textContent = updated;
+        // Auto-suggest
+        searchInput.addEventListener('keyup', function (e) {
+            const query = this.value.trim();
 
-            fullDescription = description.trim();
-            const descElement = document.getElementById('modalDescription');
-            const toggleBtn = document.getElementById('toggleDescBtn');
-
-            if (fullDescription.length > 100) {
-                descElement.textContent = fullDescription.substring(0, 100) + '...';
-                toggleBtn.textContent = 'Lihat Selengkapnya';
-                toggleBtn.classList.remove('hidden');
-            } else {
-                descElement.textContent = fullDescription || '-';
-                toggleBtn.classList.add('hidden');
+            // ENTER langsung cari
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const url = new URL(window.location.href);
+                url.searchParams.set('search', query);
+                window.location.href = url.toString();
+                return;
             }
 
-            document.getElementById('detailModal').classList.remove('hidden');
-            document.getElementById('detailModal').classList.add('flex');
-        }
-
-        function toggleDescription() {
-            const descElement = document.getElementById('modalDescription');
-            const toggleBtn = document.getElementById('toggleDescBtn');
-
-            if (descExpanded) {
-                descElement.textContent = fullDescription.substring(0, 100) + '...';
-                toggleBtn.textContent = 'Lihat Selengkapnya';
-            } else {
-                descElement.textContent = fullDescription;
-                toggleBtn.textContent = 'Sembunyikan';
-            }
-
-            descExpanded = !descExpanded;
-        }
-
-        function closeModal() {
-            document.getElementById('detailModal').classList.add('hidden');
-            document.getElementById('detailModal').classList.remove('flex');
-            descExpanded = false;
-        }
-
-        // 🔄 Filter otomatis
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.getElementById('filterForm');
-            const buildingSelect = document.getElementById('buildingSelect');
-            const roomSelect = document.getElementById('roomSelect');
-            const categorySelect = form.querySelector('select[name="category_id"]');
-
-            buildingSelect.addEventListener('change', function () {
-                const buildingId = this.value;
-                roomSelect.innerHTML = '<option value="">Memuat...</option>';
-
-                if (buildingId) {
-                    fetch(`/get-rooms/${buildingId}`)
-                        .then(response => response.json())
-                        .then(rooms => {
-                            let options = '<option value="">Ruangan</option>';
-                            rooms.forEach(room => {
-                                options += `<option value="${room.id}">${room.name}</option>`;
+            if (query.length >= 2) {
+                fetch(`/items/search?query=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        suggestionBox.innerHTML = '';
+                        if (data.length > 0) {
+                            suggestionBox.classList.remove('hidden');
+                            data.forEach(item => {
+                                const li = document.createElement('li');
+                                li.textContent = item.nama_barang;
+                                li.classList.add('px-4', 'py-2', 'hover:bg-blue-100', 'cursor-pointer');
+                                li.addEventListener('click', () => {
+                                    searchInput.value = item.nama_barang;
+                                    suggestionBox.classList.add('hidden');
+                                    const url = new URL(window.location.href);
+                                    url.searchParams.set('search', item.nama_barang);
+                                    window.location.href = url.toString();
+                                });
+                                suggestionBox.appendChild(li);
                             });
-                            roomSelect.innerHTML = options;
-                            form.submit();
-                        })
-                        .catch(() => {
-                            roomSelect.innerHTML = '<option value="">Gagal memuat ruangan</option>';
-                        });
-                } else {
-                    roomSelect.innerHTML = '<option value="">Ruangan</option>';
-                    form.submit();
-                }
-            });
-
-            [roomSelect, categorySelect].forEach(select => {
-                select.addEventListener('change', () => form.submit());
-            });
-
-            const searchForm = document.getElementById('searchForm');
-            const searchInput = searchForm.querySelector('input[name="search"]');
-            let typingTimer;
-            searchInput.addEventListener('keyup', () => {
-                clearTimeout(typingTimer);
-                typingTimer = setTimeout(() => searchForm.submit(), 800);
-            });
+                        } else {
+                            suggestionBox.classList.add('hidden');
+                        }
+                    })
+                    .catch(() => suggestionBox.classList.add('hidden'));
+            } else {
+                suggestionBox.classList.add('hidden');
+            }
         });
+
+        document.addEventListener('click', function (e) {
+            if (!suggestionBox.contains(e.target) && e.target !== searchInput) {
+                suggestionBox.classList.add('hidden');
+            }
+        });
+    });
     </script>
 
     {{-- 🎨 Styling tambahan --}}
-<style>
-    form.flex {
-        min-height: 48px;
-        align-items: center;
-    }
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #1f2937;
+        }
+        table { border-collapse: collapse; border: 1px solid #d1d5db; width: 100%; }
+        th, td { border: 1px solid #d1d5db; }
+        nav[role="navigation"] > div:first-child { display: none !important; }
+    </style>
 
-    input[type="text"], select {
-        min-width: 150px;
-        height: 38px;
-        box-sizing: border-box;
-    }
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('search');
+  const suggestionsBox = document.createElement('ul');
+  suggestionsBox.id = 'suggestions';
+  suggestionsBox.className = 'list-group position-absolute bg-white border mt-1 rounded';
+  searchInput.parentNode.appendChild(suggestionsBox);
 
-    /* 🔹 Perbaikan border tabel */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        border: 1px solid #d1d5db; /* abu-abu lembut */
-    }
+  searchInput.addEventListener('input', function() {
+    const query = this.value.trim();
 
-    th, td {
-        border: 1px solid #d1d5db; /* border tiap sel */
+    if (query.length >= 2) {
+      fetch(`/items/search?query=${query}`)
+        .then(response => response.json())
+        .then(data => {
+          suggestionsBox.innerHTML = '';
+          if (data.length > 0) {
+            data.forEach(item => {
+              const li = document.createElement('li');
+              li.textContent = item.nama_barang;
+              li.className = 'list-group-item list-group-item-action';
+              li.addEventListener('click', () => {
+                searchInput.value = item.nama_barang;
+                suggestionsBox.innerHTML = '';
+                searchInput.form.submit(); // langsung enter
+              });
+              suggestionsBox.appendChild(li);
+            });
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    } else {
+      suggestionsBox.innerHTML = '';
     }
+  });
 
-    /* 🔹 Warna dasar halaman */
-    body {
-        background-color: #f8fafc;
-        color: #1f2937;
+  // klik di luar untuk nutup dropdown
+  document.addEventListener('click', function(e) {
+    if (!searchInput.contains(e.target)) {
+      suggestionsBox.innerHTML = '';
     }
-
-    /* 🔹 Hilangkan teks info di bawah pagination */
-    nav[role="navigation"] > div:first-child {
-        display: none !important;
-    }
-</style>
-
+  });
+});
+</script>
 
 </x-app-layout>
