@@ -1,71 +1,65 @@
 @if ($paginator->hasPages())
-    <nav role="navigation" aria-label="Pagination Navigation" class="flex justify-center mt-8">
-        <ul class="flex items-center gap-3 text-[16px] font-semibold select-none">
-
-            {{-- Tombol Sebelumnya --}}
+    <nav role="navigation" aria-label="Pagination Navigation" class="flex justify-center mt-6">
+        <ul class="inline-flex items-center gap-2 bg-white p-2 rounded-2xl shadow-sm">
+            {{-- Previous Page Link --}}
             @if ($paginator->onFirstPage())
                 <li>
-                    <span class="px-5 py-3 bg-gray-100 text-gray-400 border border-gray-300 rounded-md cursor-not-allowed shadow-sm">
+                    <span class="px-4 py-2 text-gray-400 bg-gray-100 rounded-xl cursor-not-allowed">
                         Sebelumnya
                     </span>
                 </li>
             @else
                 <li>
                     <a href="{{ $paginator->previousPageUrl() }}"
-                       class="px-5 py-3 bg-white border border-gray-300 text-pink-600 rounded-md hover:bg-pink-50 hover:border-pink-400 transition duration-200 shadow-sm">
+                       class="px-4 py-2 rounded-xl bg-[#f6d8e0] text-gray-700 hover:bg-[#e0b2c8] transition font-medium">
                         Sebelumnya
                     </a>
                 </li>
             @endif
 
-            {{-- Nomor Halaman --}}
-            @php
-                $current = $paginator->currentPage();
-                $last = $paginator->lastPage();
-
-                // Tampilkan maksimal 3 halaman
-                $start = max(1, $current - 1);
-                $end = min($last, $start + 2);
-
-                // Pastikan selalu ada 3 item jika memungkinkan
-                if (($end - $start) < 2 && $last > 2) {
-                    $start = max(1, $end - 2);
-                }
-            @endphp
-
-            @for ($page = $start; $page <= $end; $page++)
-                @if ($page == $current)
+            {{-- Pagination Numbers --}}
+            @foreach ($elements as $element)
+                @if (is_string($element))
                     <li>
-                        <span class="px-4 py-2 bg-pink-500 text-white border border-pink-500 rounded-md font-bold shadow-sm">
-                            {{ $page }}
-                        </span>
-                    </li>
-                @else
-                    <li>
-                        <a href="{{ $paginator->url($page) }}"
-                           class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-md hover:bg-pink-50 hover:border-pink-400 transition duration-200 shadow-sm">
-                            {{ $page }}
-                        </a>
+                        <span class="px-3 py-2 text-gray-500">{{ $element }}</span>
                     </li>
                 @endif
-            @endfor
 
-            {{-- Tombol Berikutnya --}}
+                @if (is_array($element))
+                    @foreach ($element as $page => $url)
+                        @if ($page == $paginator->currentPage())
+                            <li>
+                                <span class="px-4 py-2 rounded-xl bg-[#e0b2c8] text-white font-semibold shadow-sm">
+                                    {{ $page }}
+                                </span>
+                            </li>
+                        @else
+                            <li>
+                                <a href="{{ $url }}"
+                                   class="px-4 py-2 rounded-xl bg-[#f8e5ed] text-gray-700 hover:bg-[#e0b2c8] hover:text-white transition font-medium">
+                                    {{ $page }}
+                                </a>
+                            </li>
+                        @endif
+                    @endforeach
+                @endif
+            @endforeach
+
+            {{-- Next Page Link --}}
             @if ($paginator->hasMorePages())
                 <li>
                     <a href="{{ $paginator->nextPageUrl() }}"
-                       class="px-5 py-3 bg-white border border-gray-300 text-pink-600 rounded-md hover:bg-pink-50 hover:border-pink-400 transition duration-200 shadow-sm">
+                       class="px-4 py-2 rounded-xl bg-[#f6d8e0] text-gray-700 hover:bg-[#e0b2c8] transition font-medium">
                         Berikutnya
                     </a>
                 </li>
             @else
                 <li>
-                    <span class="px-5 py-3 bg-gray-100 text-gray-400 border border-gray-300 rounded-md cursor-not-allowed shadow-sm">
+                    <span class="px-4 py-2 text-gray-400 bg-gray-100 rounded-xl cursor-not-allowed">
                         Berikutnya
                     </span>
                 </li>
             @endif
-
         </ul>
     </nav>
 @endif

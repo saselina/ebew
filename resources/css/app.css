@@ -13,19 +13,3 @@ body {
   color: #1f2937 !important;
 }
 
-/* Hilangkan background pink pada pagination */
-nav[role="navigation"] {
-    background: none !important;
-}
-
-/* Hilangkan atau ubah warna teks pagination info */
-nav[role="navigation"] .text-sm.text-gray-700 {
-    color: #555 !important;
-    background: transparent !important;
-}
-
-/* (Opsional) Tambah sedikit jarak dan buat rapi */
-nav[role="navigation"] {
-    margin-top: 1rem;
-    text-align: center;
-}
