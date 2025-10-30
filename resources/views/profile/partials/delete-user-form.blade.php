@@ -50,6 +50,7 @@
                     {{ __('Delete Account') }}
                 </x-danger-button>
             </div>
+
         </form>
     </x-modal>
 </section>

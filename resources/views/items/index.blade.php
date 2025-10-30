@@ -17,50 +17,78 @@
     @endif
 
     {{-- 🔽 Filter & Sortir otomatis --}}
-    <div class="mb-4">
-        <form id="filterForm" method="GET" action="{{ route('items.index') }}"
-              class="flex flex-wrap justify-center items-center bg-white p-4 rounded-xl shadow-md border border-gray-200 max-w-6xl mx-auto gap-5">
-            <select id="buildingSelect" name="building_id"
-                    class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-44 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
-                <option value="">Gedung</option>
-                @foreach ($buildings as $building)
-                    <option value="{{ $building->id }}" {{ request('building_id') == $building->id ? 'selected' : '' }}>
-                        {{ $building->name }}
-                    </option>
-                @endforeach
-            </select>
+   {{-- 🔽 Filter bergaya dashboard profesional --}}
+<div class="bg-white shadow-md rounded-lg p-6 mb-6 border border-gray-200 max-w-6xl mx-auto">
+  <h2 class="text-lg font-semibold text-gray-700 mb-4">Filter Barang</h2>
 
-            <select id="roomSelect" name="room_id"
-                    class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-44 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
-                <option value="">Ruangan</option>
-                @if (request('building_id'))
-                    @foreach ($rooms as $room)
-                        <option value="{{ $room->id }}" {{ request('room_id') == $room->id ? 'selected' : '' }}>
-                            {{ $room->name }}
-                        </option>
-                    @endforeach
-                @endif
-            </select>
+  <form id="filterForm" method="GET" action="{{ route('items.index') }}">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+      {{-- Gedung --}}
+      <div>
+        <label for="buildingSelect" class="block text-sm font-medium text-gray-600 mb-1">Gedung</label>
+        <select id="buildingSelect" name="building_id"
+          class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+          <option value="">Semua</option>
+          @foreach ($buildings as $building)
+            <option value="{{ $building->id }}" {{ request('building_id') == $building->id ? 'selected' : '' }}>
+              {{ $building->name }}
+            </option>
+          @endforeach
+        </select>
+      </div>
 
-            <select name="category_id"
-                    class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-44 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
-                <option value="">Kategori</option>
-                @foreach ($categories as $category)
-                    <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                        {{ $category->name }}
-                    </option>
-                @endforeach
-            </select>
+      {{-- Ruangan --}}
+      <div>
+        <label for="roomSelect" class="block text-sm font-medium text-gray-600 mb-1">Ruangan</label>
+        <select id="roomSelect" name="room_id"
+          class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+          <option value="">Semua</option>
+          @if (request('building_id'))
+            @foreach ($rooms as $room)
+              <option value="{{ $room->id }}" {{ request('room_id') == $room->id ? 'selected' : '' }}>
+                {{ $room->name }}
+              </option>
+            @endforeach
+          @endif
+        </select>
+      </div>
 
-            <a href="{{ route('items.index') }}" class="text-gray-600 hover:text-gray-800 text-sm underline">
-                Reset
-            </a>
-        </form>
+      {{-- Kategori --}}
+      <div>
+        <label for="category_id" class="block text-sm font-medium text-gray-600 mb-1">Kategori</label>
+        <select name="category_id" id="category_id"
+          class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+          <option value="">Semua</option>
+          @foreach ($categories as $category)
+            <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+              {{ $category->name }}
+            </option>
+          @endforeach
+        </select>
+      </div>
+
+      {{-- Tombol --}}
+      <div class="flex gap-2">
+        <button type="submit"
+          class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">Filter</button>
+        <a href="{{ route('items.index') }}"
+          class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition text-center">Reset</a>
+      </div>
+
+      {{-- Spacer kosong untuk grid 5 kolom --}}
+      <div></div>
     </div>
+  </form>
+</div>
 
     {{-- ✅ Tombol tambah + Search bar --}}
     <div class="mb-4 flex justify-between items-center max-w-7xl mx-auto relative">
-        <a href="{{ route('items.create') }}" class="btn btn-success">➕ Tambah Barang</a>
+<a href="{{ route('items.create') }}"
+   style="background-color:#f095c4 !important; color:white !important;"
+   class="px-4 py-2 rounded-lg font-semibold shadow-md transition hover:opacity-90">
+  + Tambah Barang
+</a>
+
 
         <form id="searchForm" method="GET" action="{{ route('items.index') }}" class="relative">
             <input type="text" id="search" name="search" placeholder="Cari barang..."
@@ -108,12 +136,12 @@
                             <a href="{{ route('items.edit', $item->id) }}" class="inline-block text-yellow-600 hover:text-yellow-800 text-xl">✏️</a>
 
                             {{-- 🗑️ Hapus --}}
-                            <form action="{{ route('items.destroy', $item->id) }}" method="POST" class="inline-block"
-                                  onsubmit="return confirm('Yakin ingin menghapus barang ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-800 ml-2 text-xl">🗑️</button>
-                            </form>
+                          <form action="{{ route('items.destroy', $item->id) }}" method="POST" class="inline delete-form">
+                         @csrf
+                       @method('DELETE')
+                       <button type="button" class="text-red-600 hover:text-red-800 ml-2 text-xl delete-btn">🗑️</button>
+                    </form>
+
                         </td>
                     </tr>
                 @empty
@@ -126,9 +154,69 @@
     </div>
 
     {{-- ✅ Pagination --}}
-    <div class="mt-6 flex justify-center">
-        {{ $items->links('pagination::tailwind') }}
+    <div class="flex justify-center mt-4">
+     {{ $items->links('vendor.pagination.custom-pink') }}
     </div>
+
+<style>
+/* Hapus semua garis/pink-line di bawah/sekitar pagination */
+nav[role="navigation"],
+nav[role="navigation"] * ,
+nav[role="navigation"] ul,
+nav[role="navigation"] li,
+nav[role="navigation"] a,
+nav[role="navigation"] span {
+  border: none !important;
+  border-bottom: none !important;
+  border-top: none !important;
+  box-shadow: none !important;
+  background: transparent !important; /* only affects wrappers, tombol tetap punya bg dari class mereka */
+  outline: none !important;
+}
+
+/* Kadang garis muncul dari pseudo-element -> sembunyikan */
+nav[role="navigation"]::before,
+nav[role="navigation"]::after,
+nav[role="navigation"] *::before,
+nav[role="navigation"] *::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Jika garis berada pada elemen setelah/before nav (mis. hr atau parent border) */
+nav[role="navigation"] + *,
+nav[role="navigation"] ~ *,
+nav[role="navigation"] > * {
+  border-top: none !important;
+  box-shadow: none !important;
+}
+
+/* Jika pagination dipasang tepat setelah table, sembunyikan garis bawah table */
+table + nav[role="navigation"],
+table + div > nav[role="navigation"] {
+  margin-top: 0.75rem;
+}
+table {
+  border-bottom: none !important;
+}
+
+/* Override fokus ring Tailwind khusus untuk pagination (aman karena tombol punya visual lain) */
+nav[role="navigation"] a:focus,
+nav[role="navigation"] a:active,
+nav[role="navigation"] span:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Jika masih muncul, ini akan menutupi garis horizontal yang sering jadi culprit */
+hr, .divider, .line {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+</style>
+
+
 </div>
 
 {{-- ✅ Modal Detail Barang --}}
@@ -309,7 +397,7 @@
     table { border-collapse: collapse; border: 1px solid #d1d5db; width: 100%; }
     th, td { border: 1px solid #d1d5db; }
     nav[role="navigation"] > div:first-child { display: none !important; }
-</style>
+</>
 
     <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -346,6 +434,33 @@ document.addEventListener('DOMContentLoaded', function() {
       suggestionsBox.innerHTML = '';
     }
   });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+
+    deleteButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const form = this.closest('form');
+
+            Swal.fire({
+                title: 'Yakin ingin hapus?',
+                text: "Data yang dihapus tidak bisa dikembalikan yaa.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
 });
 </script>
 
