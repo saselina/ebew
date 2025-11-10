@@ -12,12 +12,17 @@ class Item extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'category_id',
-        'room_id',
-        'quantity',
-        'description',
-    ];
+    'code',
+    'name',
+    'category_id',
+    'room_id',
+    'quantity',
+    'merk',
+    'satuan',
+    'description',
+];
+
+
 
     // Relasi ke model lain (biar bisa pakai with(['room.building', 'category']))
     public function category()

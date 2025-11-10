@@ -24,7 +24,7 @@
     <form action="{{ route('items.store') }}" method="POST">
       @csrf
 
-      {{-- 1️⃣ GEDUNG --}}
+      {{-- GEDUNG --}}
       <div class="mb-3">
         <label class="form-label">Gedung</label>
         <select id="buildingSelect" class="form-select" required>
@@ -35,7 +35,7 @@
         </select>
       </div>
 
-      {{-- 2️⃣ RUANGAN --}}
+      {{-- RUANGAN --}}
       <div class="mb-3">
         <label class="form-label">Ruangan</label>
         <select name="room_id" id="roomSelect" class="form-select" required>
@@ -43,7 +43,7 @@
         </select>
       </div>
 
-      {{-- 3️⃣ KATEGORI --}}
+      {{-- KATEGORI --}}
       <div class="mb-3">
         <label class="form-label">Kategori</label>
         <select name="category_id" class="form-select" required>
@@ -54,22 +54,41 @@
         </select>
       </div>
 
-      {{-- 4️⃣ NAMA BARANG --}}
-      <div class="mb-3">
-        <label class="form-label">Nama Barang</label>
-        <input type="text" name="name" class="form-control" required placeholder="Masukkan nama barang">
+      {{-- 2 kolom: Kode Barang & Nama Barang --}}
+       <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Nama Barang</label>
+                <input type="text" name="name" class="form-control" placeholder="Contoh: Router WiFi AC1200" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Kode Barang</label>
+                <input type="text" name="kode_barang" class="form-control" placeholder="Contoh: BRG001" required>
+            </div>
+        </div>
+
+      {{-- 2 kolom: Merk --}}
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Satuan</label>
+          <select name="satuan" class="form-select" required>
+            <option value="">Pilih Satuan</option>
+            <option value="Unit">Unit</option>
+            <option value="Pcs">Pcs</option>
+            <option value="Box">Box</option>
+          </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Merk</label>
+          <input type="text" name="merk" class="form-control" placeholder="Contoh: TP-Link" required>
+        </div>
       </div>
 
-      {{-- 5️⃣ DESKRIPSI --}}
+      {{-- STOK --}}
       <div class="mb-3">
-        <label class="form-label">Deskripsi</label>
-        <textarea name="description" class="form-control" rows="3" placeholder="Tulis deskripsi barang (opsional)"></textarea>
-      </div>
-
-      {{-- 6️⃣ JUMLAH --}}
-      <div class="mb-3">
-        <label class="form-label">Jumlah Barang</label>
-        <input type="number" name="quantity" class="form-control" required min="1" placeholder="Masukkan jumlah">
+        <label class="form-label">Stok Awal</label>
+        <input type="number" name="quantity" class="form-control" min="1" placeholder="Masukkan stok" required>
       </div>
 
       <button type="submit" class="btn btn-success">💾 Simpan</button>
@@ -78,7 +97,7 @@
   </div>
 
   <script>
-    // Saat user memilih gedung, ambil ruangan dari database
+    // Load ruangan sesuai gedung
     $('#buildingSelect').on('change', function () {
       const buildingId = $(this).val();
       const roomSelect = $('#roomSelect');

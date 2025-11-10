@@ -25,110 +25,104 @@
       @csrf
       @method('PUT')
 
-      {{-- 1️⃣ GEDUNG --}}
+      {{-- GEDUNG --}}
       <div class="mb-3">
         <label class="form-label">Gedung</label>
         <select id="buildingSelect" class="form-select" required>
           <option value="">-- Pilih Gedung --</option>
           @foreach ($buildings as $building)
-            <option value="{{ $building->id }}" {{ $item->room->building_id == $building->id ? 'selected' : '' }}>
+            <option value="{{ $building->id }}"
+              {{ $item->room->building_id == $building->id ? 'selected' : '' }}>
               {{ $building->name }}
             </option>
           @endforeach
         </select>
       </div>
 
-      {{-- 2️⃣ RUANGAN --}}
+      {{-- RUANGAN --}}
       <div class="mb-3">
         <label class="form-label">Ruangan</label>
         <select name="room_id" id="roomSelect" class="form-select" required>
-          <option value="">-- Pilih Ruangan --</option>
-          @foreach ($rooms as $room)
-            <option value="{{ $room->id }}" {{ $item->room_id == $room->id ? 'selected' : '' }}>
-              {{ $room->name }}
-            </option>
-          @endforeach
+          <option value="{{ $item->room->id }}">{{ $item->room->name }}</option>
         </select>
       </div>
 
-      {{-- 3️⃣ KATEGORI --}}
+      {{-- KATEGORI --}}
       <div class="mb-3">
         <label class="form-label">Kategori</label>
         <select name="category_id" class="form-select" required>
-          <option value="">-- Pilih Kategori --</option>
           @foreach ($categories as $category)
-            <option value="{{ $category->id }}" {{ $item->category_id == $category->id ? 'selected' : '' }}>
+            <option value="{{ $category->id }}"
+              {{ $item->category_id == $category->id ? 'selected' : '' }}>
               {{ $category->name }}
             </option>
           @endforeach
         </select>
       </div>
 
-      {{-- 4️⃣ NAMA BARANG --}}
-      <div class="mb-3">
-        <label class="form-label">Nama Barang</label>
-        <input type="text" name="name" id="nameInput" class="form-control" required value="{{ $item->name }}">
+      {{-- 2 kolom: Nama Barang & Kode Barang --}}
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Nama Barang</label>
+          <input type="text" name="name" class="form-control"
+                 value="{{ $item->name }}" required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Kode Barang</label>
+          <input type="text" name="code" class="form-control"
+            value="{{ $item->code }}" required>
+        </div>
       </div>
 
-      {{-- 5️⃣ DESKRIPSI --}}
-      <div class="mb-3">
-        <label class="form-label">Deskripsi</label>
-        <textarea name="description" id="description" class="form-control" rows="4">{{ $item->description }}</textarea>
-        <small class="text-muted">Deskripsi akan otomatis terisi berdasarkan nama dan jumlah barang.</small>
+      {{-- 2 kolom: Satuan & Merk --}}
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Satuan</label>
+          <select name="satuan" class="form-select" required data-bs-display="static" >
+            <option value="Unit" {{ $item->satuan == 'Unit' ? 'selected' : '' }}>Unit</option>
+            <option value="Pcs" {{ $item->satuan == 'Pcs' ? 'selected' : '' }}>Pcs</option>
+            <option value="Box" {{ $item->satuan == 'Box' ? 'selected' : '' }}>Box</option>
+          </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Merk</label>
+          <input type="text" name="merk" class="form-control"
+                 value="{{ $item->merk }}" required>
+        </div>
       </div>
 
-      {{-- 6️⃣ JUMLAH --}}
+      {{-- STOK --}}
       <div class="mb-3">
-        <label class="form-label">Jumlah Barang</label>
-        <input type="number" name="quantity" id="quantityInput" class="form-control" required min="1" value="{{ $item->quantity }}">
+        <label class="form-label">Stok</label>
+        <input type="number" name="quantity" class="form-control"
+               value="{{ $item->quantity }}" min="1" required>
       </div>
 
-      <button type="submit" class="btn btn-primary">💾 Update</button>
+      <button type="submit" class="btn btn-primary">✅ Update</button>
       <a href="{{ route('items.index') }}" class="btn btn-secondary">Kembali</a>
     </form>
   </div>
 
-  <script>
-    // AJAX ganti gedung → ruangan
-    $('#buildingSelect').on('change', function () {
+
+<script>
+  // AJAX ruangan berdasarkan gedung
+  $('#buildingSelect').on('change', function () {
       const buildingId = $(this).val();
       const roomSelect = $('#roomSelect');
-      roomSelect.html('<option value="">Memuat...</option>');
 
-      if (buildingId) {
-        $.ajax({
-          url: '/get-rooms/' + buildingId,
-          type: 'GET',
-          success: function (rooms) {
-            let options = '<option value="">-- Pilih Ruangan --</option>';
-            rooms.forEach(room => {
+      roomSelect.html('<option>Memuat...</option>');
+
+      $.get('/get-rooms/' + buildingId, function (rooms) {
+          let options = "";
+          rooms.forEach(room => {
               options += `<option value="${room.id}">${room.name}</option>`;
-            });
-            roomSelect.html(options);
-          },
-          error: function () {
-            roomSelect.html('<option value="">Gagal memuat ruangan</option>');
-          }
-        });
-      } else {
-        roomSelect.html('<option value="">-- Pilih Ruangan --</option>');
-      }
-    });
+          });
+          roomSelect.html(options);
+      });
+  });
+</script>
 
-    // Auto isi deskripsi
-    function updateDescription() {
-      const name = $('#nameInput').val().trim();
-      const quantity = $('#quantityInput').val().trim();
-      const currentText = $('#description').val();
-
-      // Jika nama atau jumlah ada, isi otomatis template
-      if (name || quantity) {
-        let template = `Nama barang: ${name || '-'}\nMerk:\nKode unik:\nJumlah: ${quantity || '-'}`;
-        $('#description').val(template);
-      }
-    }
-
-    $('#nameInput, #quantityInput').on('input', updateDescription);
-  </script>
 </body>
 </html>

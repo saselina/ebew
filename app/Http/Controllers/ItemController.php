@@ -139,18 +139,31 @@ class ItemController extends Controller
 
     // 🔄 Update item
     public function update(Request $request, Item $item)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'room_id' => 'required|exists:rooms,id',
-            'quantity' => 'required|integer|min:1',
-            'description' => 'nullable|string',
-        ]);
+{
+    $request->validate([
+        'code' => 'required',
+        'name' => 'required',
+        'category_id' => 'required',
+        'room_id' => 'required',
+        'quantity' => 'required|integer',
+        'merk' => 'nullable',
+        'satuan' => 'nullable',
+        'description' => 'nullable',
+    ]);
 
-        $item->update($request->all());
-        return redirect()->route('items.index')->with('success', 'Data berhasil diperbarui!');
-    }
+    $item->update([
+        'code' => $request->code,
+        'name' => $request->name,
+        'category_id' => $request->category_id,
+        'room_id' => $request->room_id,
+        'quantity' => $request->quantity,
+        'merk' => $request->merk,
+        'satuan' => $request->satuan,
+        'description' => $request->description,
+    ]);
+
+    return redirect()->route('items.index')->with('success', 'Barang berhasil diperbarui');
+}
 
     // 🗑️ Hapus item
     public function destroy(Item $item)
@@ -159,4 +172,3 @@ class ItemController extends Controller
         return redirect()->route('items.index')->with('success', 'Data berhasil dihapus!');
     }
 }
- 
